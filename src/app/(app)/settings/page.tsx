@@ -11,15 +11,37 @@ import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UploadCloud, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useProfile } from '@/contexts/profile-context';
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
+  const { 
+    companyName: currentCompanyName, 
+    email: currentEmail, 
+    avatarPreview: currentAvatarPreview, 
+    updateProfile 
+  } = useProfile();
+
+  const [companyNameInput, setCompanyNameInput] = React.useState<string>(currentCompanyName);
+  const [emailInput, setEmailInput] = React.useState<string>(currentEmail);
   const [avatarFile, setAvatarFile] = React.useState<File | null>(null);
-  const [companyName, setCompanyName] = React.useState<string>("Your Company LLC");
-  const [email, setEmail] = React.useState<string>("contact@yourcompany.com");
+  // Local preview for the settings page, to show immediate change before saving
+  const [localAvatarPreview, setLocalAvatarPreview] = React.useState<string | null>(currentAvatarPreview);
+  
   const [defaultNotes, setDefaultNotes] = React.useState<string>("Thank you for your business!");
   const [taxId, setTaxId] = React.useState<string>("Your Tax ID");
+
+  React.useEffect(() => {
+    setCompanyNameInput(currentCompanyName);
+  }, [currentCompanyName]);
+
+  React.useEffect(() => {
+    setEmailInput(currentEmail);
+  }, [currentEmail]);
+  
+  React.useEffect(() => {
+    setLocalAvatarPreview(currentAvatarPreview);
+  }, [currentAvatarPreview]);
 
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,22 +50,25 @@ export default function SettingsPage() {
       setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
+        setLocalAvatarPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     } else {
       setAvatarFile(null);
-      setAvatarPreview(null);
+      setLocalAvatarPreview(currentAvatarPreview); // Revert to saved if selection is cancelled
     }
   };
 
   const handleSaveProfile = () => {
-    console.log('Saving profile with data:');
-    console.log('Company Name:', companyName);
-    console.log('Email:', email);
+    updateProfile({ 
+      companyName: companyNameInput, 
+      email: emailInput,
+      avatarPreview: localAvatarPreview // Save the locally previewed avatar
+    });
+
     if (avatarFile) {
-      console.log('Avatar to upload:', avatarFile.name);
-      // Here you would typically upload avatarFile to your backend/storage
+      console.log('Avatar to upload (simulation):', avatarFile.name);
+      // Actual file upload logic would go here
     }
     toast({
       title: "Profile Saved",
@@ -77,8 +102,8 @@ export default function SettingsPage() {
                         <Label htmlFor="avatar-upload-input">Company Logo / Avatar</Label>
                         <div className="flex items-center gap-4">
                             <Avatar className="h-20 w-20">
-                                <AvatarImage src={avatarPreview || "https://placehold.co/200x200.png"} alt="Company Logo" data-ai-hint="logo company"/>
-                                <AvatarFallback>{companyName?.substring(0,2).toUpperCase() || 'CL'}</AvatarFallback>
+                                <AvatarImage src={localAvatarPreview || "https://placehold.co/200x200.png"} alt="Company Logo" data-ai-hint="logo company"/>
+                                <AvatarFallback>{companyNameInput?.substring(0,2).toUpperCase() || 'CL'}</AvatarFallback>
                             </Avatar>
                             <input
                                 type="file"
@@ -98,11 +123,11 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="name">Full Name / Company Name</Label>
-                        <Input id="name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+                        <Input id="name" value={companyNameInput} onChange={(e) => setCompanyNameInput(e.target.value)} />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <Input id="email" type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
                     </div>
                     <Button onClick={handleSaveProfile}>
                         <Save className="mr-2 h-4 w-4" /> Save Profile
