@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   Package2,
+  ScanLine, // Ícone adicionado
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const navItems = [
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/reports', label: 'Reports', icon: BarChart3 },
   { href: '/smart-reminders', label: 'Smart Reminders', icon: Sparkles },
+  { href: '/ocr-scan', label: 'Reconhecimento OCR', icon: ScanLine }, // Novo item de menu
   { href: '/subscriptions', label: 'Subscription', icon: CreditCard },
 ];
 
