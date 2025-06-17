@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -28,10 +29,11 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, PlusCircle, Trash2, Save, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { placeholderClients } from '@/lib/placeholder-data';
 import type { Invoice, Client, InvoiceItem as InvoiceItemType } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image'; // Import next/image
+import { useProfile } from '@/contexts/profile-context'; // Import useProfile
 
 const invoiceItemSchema = z.object({
   description: z.string().min(1, 'Description is required'),
@@ -64,6 +66,8 @@ const defaultItem: Omit<InvoiceItemType, 'id' | 'total'> = {
 };
 
 export function InvoiceForm({ initialData, onSubmit, clients }: InvoiceFormProps) {
+  const { avatarPreview, companyName } = useProfile(); // Get avatarPreview and companyName from context
+
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
     defaultValues: {
@@ -109,6 +113,19 @@ export function InvoiceForm({ initialData, onSubmit, clients }: InvoiceFormProps
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            {avatarPreview && (
+              <div className="relative h-20 w-20 mb-2 rounded-md overflow-hidden border">
+                <Image src={avatarPreview} alt={companyName || "Company Logo"} layout="fill" objectFit="contain" data-ai-hint="logo company" />
+              </div>
+            )}
+            <h2 className="text-xl font-semibold">{companyName || 'Your Company'}</h2>
+            {/* Placeholder for company address if available from profile/settings */}
+          </div>
+          <h1 className="text-3xl font-bold text-primary">INVOICE</h1>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <FormField
             control={form.control}
@@ -380,3 +397,4 @@ export function InvoiceForm({ initialData, onSubmit, clients }: InvoiceFormProps
     </Form>
   );
 }
+
