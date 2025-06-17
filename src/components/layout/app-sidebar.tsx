@@ -13,7 +13,7 @@ import {
   Settings,
   LogOut,
   Package2,
-  ScanLine, // Ícone adicionado
+  ScanLine,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -27,24 +27,40 @@ import {
   SidebarMenuButton,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
+import { useLanguage, type SupportedLanguage } from '@/contexts/language-context';
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/invoices', label: 'Invoices', icon: FileText },
-  { href: '/clients', label: 'Clients', icon: Users },
-  { href: '/reports', label: 'Reports', icon: BarChart3 },
-  { href: '/smart-reminders', label: 'Smart Reminders', icon: Sparkles },
-  { href: '/ocr-scan', label: 'Reconhecimento OCR', icon: ScanLine }, // Novo item de menu
-  { href: '/subscriptions', label: 'Subscription', icon: CreditCard },
-];
-
-const bottomNavItems = [
-  { href: '/settings', label: 'Settings', icon: Settings },
-];
+const navItemLabels: Record<string, Record<SupportedLanguage, string>> = {
+  Dashboard: { en: 'Dashboard', pt: 'Painel', es: 'Tablero' },
+  Invoices: { en: 'Invoices', pt: 'Faturas', es: 'Facturas' },
+  Clients: { en: 'Clients', pt: 'Clientes', es: 'Clientes' },
+  Reports: { en: 'Reports', pt: 'Relatórios', es: 'Informes' },
+  'Smart Reminders': { en: 'Smart Reminders', pt: 'Lembretes Inteligentes', es: 'Recordatorios Inteligentes' },
+  'Reconhecimento OCR': { en: 'OCR Scan', pt: 'Reconhecimento OCR', es: 'Escaneo OCR' },
+  Subscription: { en: 'Subscription', pt: 'Assinatura', es: 'Suscripción' },
+  Settings: { en: 'Settings', pt: 'Configurações', es: 'Configuración' },
+  Logout: { en: 'Logout', pt: 'Sair', es: 'Cerrar Sesión' },
+};
 
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { language } = useLanguage();
+
+  const getTranslatedLabel = (key: string) => navItemLabels[key]?.[language] || key;
+
+  const navItems = [
+    { href: '/dashboard', labelKey: 'Dashboard', icon: Home },
+    { href: '/invoices', labelKey: 'Invoices', icon: FileText },
+    { href: '/clients', labelKey: 'Clients', icon: Users },
+    { href: '/reports', labelKey: 'Reports', icon: BarChart3 },
+    { href: '/smart-reminders', labelKey: 'Smart Reminders', icon: Sparkles },
+    { href: '/ocr-scan', labelKey: 'Reconhecimento OCR', icon: ScanLine },
+    { href: '/subscriptions', labelKey: 'Subscription', icon: CreditCard },
+  ];
+
+  const bottomNavItems = [
+    { href: '/settings', labelKey: 'Settings', icon: Settings },
+  ];
 
   const isActive = (path: string) => {
     if (path === '/dashboard') return pathname === path;
@@ -66,12 +82,12 @@ export function AppSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={isActive(item.href)}
-                tooltip={{ children: item.label, side: 'right', align: 'center' }}
+                tooltip={{ children: getTranslatedLabel(item.labelKey), side: 'right', align: 'center' }}
                 className="justify-start"
               >
                 <Link href={item.href}>
                   <item.icon className="h-5 w-5" />
-                  <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                  <span className="group-data-[collapsible=icon]:hidden">{getTranslatedLabel(item.labelKey)}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -86,24 +102,24 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={isActive(item.href)}
-                  tooltip={{ children: item.label, side: 'right', align: 'center' }}
+                  tooltip={{ children: getTranslatedLabel(item.labelKey), side: 'right', align: 'center' }}
                   className="justify-start"
                 >
                   <Link href={item.href}>
                     <item.icon className="h-5 w-5" />
-                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                    <span className="group-data-[collapsible=icon]:hidden">{getTranslatedLabel(item.labelKey)}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
           ))}
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={{ children: 'Logout', side: 'right', align: 'center' }}
+              tooltip={{ children: getTranslatedLabel('Logout'), side: 'right', align: 'center' }}
               className="justify-start text-red-500 hover:bg-red-500/10 hover:text-red-400"
               onClick={() => router.push('/logout-success')}
             >
                 <LogOut className="h-5 w-5" />
-                <span className="group-data-[collapsible=icon]:hidden">Logout</span>
+                <span className="group-data-[collapsible=icon]:hidden">{getTranslatedLabel('Logout')}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

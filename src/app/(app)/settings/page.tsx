@@ -12,6 +12,32 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UploadCloud, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useProfile } from '@/contexts/profile-context';
+import { useLanguage, type SupportedLanguage } from '@/contexts/language-context';
+
+const translations = {
+  profileTitle: { en: 'Profile', pt: 'Perfil', es: 'Perfil' },
+  profileDesc: { en: 'Update your personal information.', pt: 'Atualize suas informações pessoais.', es: 'Actualiza tu información personal.' },
+  companyLogoLabel: { en: 'Company Logo / Avatar', pt: 'Logo da Empresa / Avatar', es: 'Logo de la Empresa / Avatar' },
+  uploadButton: { en: 'Upload', pt: 'Carregar', es: 'Subir' },
+  nameLabel: { en: 'Full Name / Company Name', pt: 'Nome Completo / Nome da Empresa', es: 'Nombre Completo / Nombre de la Empresa' },
+  emailLabel: { en: 'Email Address', pt: 'Endereço de Email', es: 'Dirección de Correo Electrónico' },
+  saveProfileButton: { en: 'Save Profile', pt: 'Salvar Perfil', es: 'Guardar Perfil' },
+  profileSavedToast: { en: 'Profile Saved', pt: 'Perfil Salvo', es: 'Perfil Guardado' },
+  profileUpdatedToastDesc: { en: 'Your profile information has been updated.', pt: 'Suas informações de perfil foram atualizadas.', es: 'Tu información de perfil ha sido actualizada.' },
+  invoiceCustomizationTitle: { en: 'Invoice Customization', pt: 'Personalização de Fatura', es: 'Personalización de Factura' },
+  invoiceCustomizationDesc: { en: 'Personalize your invoice appearance.', pt: 'Personalize a aparência da sua fatura.', es: 'Personaliza la apariencia de tu factura.' },
+  defaultNotesLabel: { en: 'Default Invoice Notes/Terms', pt: 'Notas/Termos Padrão da Fatura', es: 'Notas/Términos Predeterminados de la Factura' },
+  taxIdLabel: { en: 'Default Tax ID / VAT Number', pt: 'CPF/CNPJ ou Ident. Fiscal Padrão', es: 'ID de Impuestos / NIF Predeterminado' },
+  saveInvoiceSettingsButton: { en: 'Save Invoice Settings', pt: 'Salvar Config. da Fatura', es: 'Guardar Config. de Factura' },
+  invoiceSettingsSavedToast: { en: 'Invoice Settings Saved', pt: 'Configurações da Fatura Salvas', es: 'Configuración de Factura Guardada' },
+  invoiceSettingsUpdatedToastDesc: { en: 'Your invoice customization settings have been updated.', pt: 'Suas configurações de personalização de fatura foram atualizadas.', es: 'Tu configuración de personalización de factura ha sido actualizada.' },
+  notificationsTitle: { en: 'Notifications', pt: 'Notificações', es: 'Notificaciones' },
+  notificationsDesc: { en: 'Manage your email notification preferences.', pt: 'Gerencie suas preferências de notificação por email.', es: 'Gestiona tus preferencias de notificación por correo electrónico.' },
+  notificationsSoon: { en: 'Notification settings (e.g., email for overdue invoices, payment confirmations) will be configurable here.', pt: 'Configurações de notificação (ex: email para faturas vencidas, confirmações de pagamento) serão configuráveis aqui.', es: 'La configuración de notificaciones (p. ej., correo para facturas vencidas, confirmaciones de pago) se podrá configurar aquí.' },
+  manageNotificationsButton: { en: 'Manage Notifications (Coming Soon)', pt: 'Gerenciar Notificações (Em Breve)', es: 'Gestionar Notificaciones (Próximamente)' },
+  defaultNotesPlaceholder: { en: "Thank you for your business!", pt: "Obrigado pelo seu negócio!", es: "¡Gracias por su negocio!" },
+  taxIdPlaceholder: { en: "Your Tax ID", pt: "Seu CPF/CNPJ ou Ident. Fiscal", es: "Su ID de Impuestos" },
+};
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -21,15 +47,17 @@ export default function SettingsPage() {
     avatarPreview: currentAvatarPreview, 
     updateProfile 
   } = useProfile();
+  const { language } = useLanguage();
 
   const [companyNameInput, setCompanyNameInput] = React.useState<string>(currentCompanyName);
   const [emailInput, setEmailInput] = React.useState<string>(currentEmail);
   const [avatarFile, setAvatarFile] = React.useState<File | null>(null);
-  // Local preview for the settings page, to show immediate change before saving
   const [localAvatarPreview, setLocalAvatarPreview] = React.useState<string | null>(currentAvatarPreview);
   
-  const [defaultNotes, setDefaultNotes] = React.useState<string>("Thank you for your business!");
-  const [taxId, setTaxId] = React.useState<string>("Your Tax ID");
+  const [defaultNotes, setDefaultNotes] = React.useState<string>(translations.defaultNotesPlaceholder[language]);
+  const [taxId, setTaxId] = React.useState<string>(translations.taxIdPlaceholder[language]);
+
+  const t = (key: keyof typeof translations) => translations[key][language] || translations[key]['en'];
 
   React.useEffect(() => {
     setCompanyNameInput(currentCompanyName);
@@ -43,6 +71,11 @@ export default function SettingsPage() {
     setLocalAvatarPreview(currentAvatarPreview);
   }, [currentAvatarPreview]);
 
+  React.useEffect(() => {
+    setDefaultNotes(translations.defaultNotesPlaceholder[language]);
+    setTaxId(translations.taxIdPlaceholder[language]);
+  }, [language]);
+
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -55,7 +88,7 @@ export default function SettingsPage() {
       reader.readAsDataURL(file);
     } else {
       setAvatarFile(null);
-      setLocalAvatarPreview(currentAvatarPreview); // Revert to saved if selection is cancelled
+      setLocalAvatarPreview(currentAvatarPreview); 
     }
   };
 
@@ -63,16 +96,15 @@ export default function SettingsPage() {
     updateProfile({ 
       companyName: companyNameInput, 
       email: emailInput,
-      avatarPreview: localAvatarPreview // Save the locally previewed avatar
+      avatarPreview: localAvatarPreview 
     });
 
     if (avatarFile) {
       console.log('Avatar to upload (simulation):', avatarFile.name);
-      // Actual file upload logic would go here
     }
     toast({
-      title: "Profile Saved",
-      description: "Your profile information has been updated.",
+      title: t('profileSavedToast'),
+      description: t('profileUpdatedToastDesc'),
     });
   };
 
@@ -81,8 +113,8 @@ export default function SettingsPage() {
     console.log('Default Notes:', defaultNotes);
     console.log('Tax ID:', taxId);
     toast({
-        title: "Invoice Settings Saved",
-        description: "Your invoice customization settings have been updated.",
+        title: t('invoiceSettingsSavedToast'),
+        description: t('invoiceSettingsUpdatedToastDesc'),
     });
   };
 
@@ -94,12 +126,12 @@ export default function SettingsPage() {
         <div className="md:col-span-1">
             <Card>
                 <CardHeader>
-                    <CardTitle>Profile</CardTitle>
-                    <CardDescription>Update your personal information.</CardDescription>
+                    <CardTitle>{t('profileTitle')}</CardTitle>
+                    <CardDescription>{t('profileDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                      <div className="space-y-2">
-                        <Label htmlFor="avatar-upload-input">Company Logo / Avatar</Label>
+                        <Label htmlFor="avatar-upload-input">{t('companyLogoLabel')}</Label>
                         <div className="flex items-center gap-4">
                             <Avatar className="h-20 w-20">
                                 <AvatarImage src={localAvatarPreview || "https://placehold.co/200x200.png"} alt="Company Logo" data-ai-hint="logo company"/>
@@ -115,22 +147,22 @@ export default function SettingsPage() {
                             <Label htmlFor="avatar-upload-input" className="cursor-pointer">
                                 <Button variant="outline" size="sm" asChild>
                                     <div>
-                                        <UploadCloud className="mr-2 h-4 w-4" /> Upload
+                                        <UploadCloud className="mr-2 h-4 w-4" /> {t('uploadButton')}
                                     </div>
                                 </Button>
                             </Label>
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="name">Full Name / Company Name</Label>
+                        <Label htmlFor="name">{t('nameLabel')}</Label>
                         <Input id="name" value={companyNameInput} onChange={(e) => setCompanyNameInput(e.target.value)} />
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="email">Email Address</Label>
+                        <Label htmlFor="email">{t('emailLabel')}</Label>
                         <Input id="email" type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
                     </div>
                     <Button onClick={handleSaveProfile}>
-                        <Save className="mr-2 h-4 w-4" /> Save Profile
+                        <Save className="mr-2 h-4 w-4" /> {t('saveProfileButton')}
                     </Button>
                 </CardContent>
             </Card>
@@ -139,20 +171,20 @@ export default function SettingsPage() {
         <div className="md:col-span-2">
             <Card>
                 <CardHeader>
-                    <CardTitle>Invoice Customization</CardTitle>
-                    <CardDescription>Personalize your invoice appearance.</CardDescription>
+                    <CardTitle>{t('invoiceCustomizationTitle')}</CardTitle>
+                    <CardDescription>{t('invoiceCustomizationDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-1">
-                        <Label htmlFor="defaultNotes">Default Invoice Notes/Terms</Label>
-                        <Input id="defaultNotes" value={defaultNotes} onChange={(e) => setDefaultNotes(e.target.value)} />
+                        <Label htmlFor="defaultNotes">{t('defaultNotesLabel')}</Label>
+                        <Input id="defaultNotes" value={defaultNotes} onChange={(e) => setDefaultNotes(e.target.value)} placeholder={t('defaultNotesPlaceholder')} />
                     </div>
                      <div className="space-y-1">
-                        <Label htmlFor="taxId">Default Tax ID / VAT Number</Label>
-                        <Input id="taxId" value={taxId} onChange={(e) => setTaxId(e.target.value)} />
+                        <Label htmlFor="taxId">{t('taxIdLabel')}</Label>
+                        <Input id="taxId" value={taxId} onChange={(e) => setTaxId(e.target.value)} placeholder={t('taxIdPlaceholder')} />
                     </div>
                     <Button onClick={handleSaveInvoiceSettings}>
-                         <Save className="mr-2 h-4 w-4" /> Save Invoice Settings
+                         <Save className="mr-2 h-4 w-4" /> {t('saveInvoiceSettingsButton')}
                     </Button>
                 </CardContent>
             </Card>
@@ -161,12 +193,12 @@ export default function SettingsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Notifications</CardTitle>
-                    <CardDescription>Manage your email notification preferences.</CardDescription>
+                    <CardTitle>{t('notificationsTitle')}</CardTitle>
+                    <CardDescription>{t('notificationsDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                   <p className="text-sm text-muted-foreground">Notification settings (e.g., email for overdue invoices, payment confirmations) will be configurable here.</p>
-                   <Button variant="outline" disabled>Manage Notifications (Coming Soon)</Button>
+                   <p className="text-sm text-muted-foreground">{t('notificationsSoon')}</p>
+                   <Button variant="outline" disabled>{t('manageNotificationsButton')}</Button>
                 </CardContent>
             </Card>
         </div>
