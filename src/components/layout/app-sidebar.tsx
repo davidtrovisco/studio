@@ -95,7 +95,6 @@ export function AppSidebar() {
           ))}
           <SidebarMenuItem>
             <SidebarMenuButton
-              asChild
               tooltip={{ children: 'Logout', side: 'right', align: 'center' }}
               className="justify-start text-red-500 hover:bg-red-500/10 hover:text-red-400"
               onClick={() => { /* Implement logout */ }}
