@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -59,17 +60,17 @@ export function AppSidebar() {
         <SidebarMenu className="p-2">
           {navItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <Link href={item.href} legacyBehavior passHref>
+              <Link href={item.href}>
                 <SidebarMenuButton
                   asChild
                   isActive={isActive(item.href)}
                   tooltip={{ children: item.label, side: 'right', align: 'center' }}
                   className="justify-start"
                 >
-                  <a>
+                  <>
                     <item.icon className="h-5 w-5" />
                     <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                  </a>
+                  </>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
@@ -81,17 +82,17 @@ export function AppSidebar() {
         <SidebarMenu>
           {bottomNavItems.map((item) => (
              <SidebarMenuItem key={item.href}>
-                <Link href={item.href} legacyBehavior passHref>
+                <Link href={item.href}>
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.href)}
                     tooltip={{ children: item.label, side: 'right', align: 'center' }}
                     className="justify-start"
                   >
-                    <a>
+                    <>
                       <item.icon className="h-5 w-5" />
                       <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                    </a>
+                    </>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
@@ -103,10 +104,11 @@ export function AppSidebar() {
               className="justify-start text-red-500 hover:bg-red-500/10 hover:text-red-400"
               onClick={() => { /* Implement logout */ }}
             >
-              <a>
+              {/* This is a button, not a link, so it doesn't need <Link> or <a> */}
+              <>
                 <LogOut className="h-5 w-5" />
                 <span className="group-data-[collapsible=icon]:hidden">Logout</span>
-              </a>
+              </>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
