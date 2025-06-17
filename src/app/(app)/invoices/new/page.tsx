@@ -1,3 +1,5 @@
+'use client';
+
 import { PageTitle } from '@/components/shared/page-title';
 import { InvoiceForm } from '@/components/invoices/invoice-form';
 import { placeholderClients } from '@/lib/placeholder-data';
