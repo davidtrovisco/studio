@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Home,
   FileText,
@@ -42,6 +42,7 @@ const bottomNavItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (path: string) => {
     if (path === '/dashboard') return pathname === path;
@@ -97,12 +98,10 @@ export function AppSidebar() {
             <SidebarMenuButton
               tooltip={{ children: 'Logout', side: 'right', align: 'center' }}
               className="justify-start text-red-500 hover:bg-red-500/10 hover:text-red-400"
-              onClick={() => { /* Implement logout */ }}
+              onClick={() => router.push('/logout-success')}
             >
-              <>
                 <LogOut className="h-5 w-5" />
                 <span className="group-data-[collapsible=icon]:hidden">Logout</span>
-              </>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
