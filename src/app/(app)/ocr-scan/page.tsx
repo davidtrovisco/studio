@@ -4,7 +4,7 @@
 import { PageTitle } from '@/components/shared/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Download } from 'lucide-react'; // Import Download icon
+import { UploadCloud, Download } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -48,12 +48,20 @@ export default function OcrScanPage() {
     setIsLoading(true);
     setExtractedText("Simulando extração de texto..."); // Placeholder for actual OCR call
     // In a real app, you would call your Genkit flow here:
-    // const formData = new FormData();
-    // formData.append('image', selectedFile);
-    // const response = await fetch('/api/ocr', { method: 'POST', body: formData });
-    // const data = await response.json();
-    // setExtractedText(data.text);
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+    // const fileReader = new FileReader();
+    // fileReader.readAsDataURL(selectedFile);
+    // fileReader.onload = async () => {
+    //   const photoDataUri = fileReader.result as string;
+    //   // const result = await yourGenkitOcrFlow({ photoDataUri });
+    //   // setExtractedText(result.extractedData); // Assuming result has this structure
+    //   setIsLoading(false);
+    //   toast({ title: 'Texto Extraído!', description: 'Os dados da imagem foram processados.' });
+    // };
+    // fileReader.onerror = () => {
+    //   setIsLoading(false);
+    //   toast({ variant: 'destructive', title: 'Erro ao ler arquivo.' });
+    // };
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
     setExtractedText(`Dados extraídos (simulado):\nValor: R$ 123,45\nData: 20/10/2023\nEmpresa: Exemplo LTDA\nCNPJ: 00.000.000/0001-00`);
     setIsLoading(false);
     toast({
@@ -64,12 +72,59 @@ export default function OcrScanPage() {
 
   const handleExportToExcel = () => {
     if (!extractedText) return;
-    // In a real app, this would trigger a CSV/Excel download.
-    console.log("Exporting to Excel (simulated):", extractedText);
-    toast({
-        title: 'Exportação Iniciada (Simulação)',
-        description: 'Os dados extraídos seriam formatados e baixados como Excel.',
-    });
+
+    const lines = extractedText.split('\n');
+    const dataRows: string[] = [];
+    
+    // Skip the first line if it's the header "Dados extraídos (simulado):"
+    const startIndex = lines[0].toLowerCase().includes("dados extraídos") ? 1 : 0;
+
+    for (let i = startIndex; i < lines.length; i++) {
+        const line = lines[i];
+        const colonIndex = line.indexOf(':');
+        if (colonIndex > -1) {
+            const field = line.substring(0, colonIndex).trim();
+            const value = line.substring(colonIndex + 1).trim();
+            // Escape double quotes in value by replacing with two double quotes
+            const escapedValue = value.replace(/"/g, '""');
+            dataRows.push(`"${field}","${escapedValue}"`);
+        }
+    }
+
+    if (dataRows.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Nenhum dado para exportar',
+        description: 'Não foi possível parsear os dados extraídos para o formato CSV.',
+      });
+      return;
+    }
+
+    const csvHeader = "Campo,Valor\n";
+    const csvContent = csvHeader + dataRows.join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) { // Check if HTML5 download attribute is supported
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "dados_extraidos.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toast({
+            title: 'Exportação Concluída',
+            description: 'O arquivo dados_extraidos.csv foi baixado.',
+        });
+    } else {
+         toast({
+            variant: 'destructive',
+            title: 'Exportação não suportada',
+            description: 'Seu navegador não suporta o download direto de arquivos.',
+        });
+    }
   };
 
   return (
@@ -111,8 +166,8 @@ export default function OcrScanPage() {
             <div className="space-y-4 pt-4 border-t">
               <h3 className="text-lg font-medium">Dados Extraídos:</h3>
               <pre className="p-4 bg-muted rounded-md text-sm whitespace-pre-wrap">{extractedText}</pre>
-              <Button onClick={handleExportToExcel} variant="outline">
-                <Download className="mr-2 h-4 w-4" /> Exportar para Excel (Simulado)
+              <Button onClick={handleExportToExcel} variant="outline" disabled={isLoading}>
+                <Download className="mr-2 h-4 w-4" /> Exportar para CSV
               </Button>
             </div>
           )}
@@ -121,3 +176,4 @@ export default function OcrScanPage() {
     </>
   );
 }
+
