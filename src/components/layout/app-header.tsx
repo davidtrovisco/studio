@@ -10,8 +10,15 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Palette } from 'lucide-react'; // Added Palette icon
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Palette, Languages } from 'lucide-react'; // Added Palette and Languages icons
 import type { Dispatch, SetStateAction } from 'react';
 
 interface AppHeaderProps {
@@ -28,6 +35,12 @@ const backgroundOptions = [
   { value: 'bg-emerald-50', label: 'Light Emerald' },
 ];
 
+const handleLanguageChange = (language: string) => {
+  // In a real app, you would set the language preference using an i18n library
+  console.log(`Language selected: ${language}`);
+  // For example, you might use: router.push(pathname, { locale: language });
+};
+
 export function AppHeader({ className, currentBgClass, onBgChange }: AppHeaderProps) {
   return (
     <header
@@ -43,13 +56,28 @@ export function AppHeader({ className, currentBgClass, onBgChange }: AppHeaderPr
         {/* Placeholder for breadcrumbs or page title if needed */}
       </div>
       <div className="flex items-center gap-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" aria-label="Change language">
+              <Languages className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleLanguageChange('es')}>Español</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleLanguageChange('pt')}>Português</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>Français</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleLanguageChange('de')}>Deutsch</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <div className="flex items-center gap-2">
-          <Palette className="h-5 w-5 text-muted-foreground" /> 
+          <Palette className="h-5 w-5 text-muted-foreground" />
           <Select value={currentBgClass} onValueChange={onBgChange}>
-            <SelectTrigger 
-              id="bg-selector" 
+            <SelectTrigger
+              id="bg-selector"
               className="w-[150px] h-9"
-              aria-label="Background color" // Added aria-label
+              aria-label="Background color"
             >
               <SelectValue placeholder="Select background" />
             </SelectTrigger>
