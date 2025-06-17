@@ -1,3 +1,5 @@
+'use client';
+
 import { PageTitle } from '@/components/shared/page-title';
 import { ReportChart } from '@/components/reports/report-chart';
 import { Button } from '@/components/ui/button';

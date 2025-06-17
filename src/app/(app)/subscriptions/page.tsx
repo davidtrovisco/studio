@@ -1,3 +1,5 @@
+'use client';
+
 import { PageTitle } from '@/components/shared/page-title';
 import { PlanCard } from '@/components/subscriptions/plan-card';
 import { placeholderSubscriptionPlans } from '@/lib/placeholder-data';
