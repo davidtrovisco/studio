@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Label } from '@/components/ui/label';
+import { Palette } from 'lucide-react'; // Added Palette icon
 import type { Dispatch, SetStateAction } from 'react';
 
 interface AppHeaderProps {
@@ -44,9 +44,13 @@ export function AppHeader({ className, currentBgClass, onBgChange }: AppHeaderPr
       </div>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <Label htmlFor="bg-selector" className="text-sm text-muted-foreground hidden sm:block">Background:</Label>
+          <Palette className="h-5 w-5 text-muted-foreground" /> 
           <Select value={currentBgClass} onValueChange={onBgChange}>
-            <SelectTrigger id="bg-selector" className="w-[150px] h-9">
+            <SelectTrigger 
+              id="bg-selector" 
+              className="w-[150px] h-9"
+              aria-label="Background color" // Added aria-label
+            >
               <SelectValue placeholder="Select background" />
             </SelectTrigger>
             <SelectContent>
