@@ -1,3 +1,7 @@
+
+'use client';
+
+import * as React from 'react';
 import { PageTitle } from '@/components/shared/page-title';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +12,34 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UploadCloud } from 'lucide-react';
 
 export default function SettingsPage() {
+  const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = React.useState<File | null>(null);
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setAvatarFile(null);
+      setAvatarPreview(null); // Or reset to a default if desired
+    }
+  };
+
+  const handleSaveProfile = () => {
+    // TODO: Implement actual profile saving logic, including avatarFile upload
+    console.log('Saving profile...');
+    if (avatarFile) {
+      console.log('Avatar to upload:', avatarFile.name);
+      // Here you would typically upload avatarFile to your backend/storage
+    }
+  };
+
+
   return (
     <>
       <PageTitle title="Settings" />
@@ -20,15 +52,26 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                      <div className="space-y-2">
-                        <Label htmlFor="avatar">Company Logo / Avatar</Label>
+                        <Label htmlFor="avatar-upload-input">Company Logo / Avatar</Label>
                         <div className="flex items-center gap-4">
                             <Avatar className="h-20 w-20">
-                                <AvatarImage src="https://placehold.co/200x200.png" alt="Company Logo" data-ai-hint="logo company" />
+                                <AvatarImage src={avatarPreview || "https://placehold.co/200x200.png"} alt="Company Logo" data-ai-hint="logo company" />
                                 <AvatarFallback>CL</AvatarFallback>
                             </Avatar>
-                            <Button variant="outline" size="sm">
-                                <UploadCloud className="mr-2 h-4 w-4" /> Upload
-                            </Button>
+                            <input
+                                type="file"
+                                id="avatar-upload-input"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleAvatarChange}
+                            />
+                            <Label htmlFor="avatar-upload-input" className="cursor-pointer">
+                                <Button variant="outline" size="sm" asChild>
+                                    <div> {/* Wrapping div for the button content to satisfy asChild */}
+                                        <UploadCloud className="mr-2 h-4 w-4" /> Upload
+                                    </div>
+                                </Button>
+                            </Label>
                         </div>
                     </div>
                     <div className="space-y-1">
@@ -39,7 +82,7 @@ export default function SettingsPage() {
                         <Label htmlFor="email">Email Address</Label>
                         <Input id="email" type="email" defaultValue="contact@yourcompany.com" />
                     </div>
-                    <Button>Save Profile</Button>
+                    <Button onClick={handleSaveProfile}>Save Profile</Button>
                 </CardContent>
             </Card>
         </div>
