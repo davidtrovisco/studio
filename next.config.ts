@@ -1,7 +1,7 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: 'export', // 🔹 fundamental para gerar site estático
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    unoptimized: true, // 🔹 importante para export funcionar
     remotePatterns: [
       {
         protocol: 'https',
@@ -18,6 +19,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // 🔹 se o repositório não for do tipo teunome.github.io, ativa o basePath:
+ // <--- só se o repo não for teunome.github.io
 };
 
 export default nextConfig;
