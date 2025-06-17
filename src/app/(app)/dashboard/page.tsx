@@ -1,12 +1,16 @@
+
+'use client'; // Converted to Client Component
+
 import { PageTitle } from '@/components/shared/page-title';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { placeholderInvoices } from '@/lib/placeholder-data';
 import type { Invoice } from '@/types';
-import { DollarSign, FileText, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { DollarSign, FileText, AlertTriangle } from 'lucide-react'; // Removed CheckCircle2 as it's not used
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useLanguage, type SupportedLanguage } from '@/contexts/language-context'; // Added
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
@@ -22,7 +26,7 @@ const formatDate = (dateString: string) => {
 
 const getStatusBadgeVariant = (status: Invoice['status']) => {
   switch (status) {
-    case 'paid': return 'default'; // Using primary for paid as it's a positive status
+    case 'paid': return 'default'; 
     case 'sent': return 'secondary';
     case 'overdue': return 'destructive';
     case 'draft': return 'outline';
@@ -30,8 +34,24 @@ const getStatusBadgeVariant = (status: Invoice['status']) => {
   }
 };
 
+const cardTitleTranslations: Record<string, Record<SupportedLanguage, string>> = {
+  "Total Revenue": { en: "Total Revenue", pt: "Receita Total", es: "Ingresos Totales" },
+  "Pending Amount": { en: "Pending Amount", pt: "Valor Pendente", es: "Monto Pendiente" },
+  "Overdue Invoices": { en: "Overdue Invoices", pt: "Faturas Vencidas", es: "Facturas Vencidas" },
+  "Recent Invoices": { en: "Recent Invoices", pt: "Faturas Recentes", es: "Facturas Recientes" },
+};
+
+const cardDescriptionTranslations: Record<string, Record<SupportedLanguage, string>> = {
+  "recentInvoices": { en: "A quick look at your latest invoices.", pt: "Uma olhada rápida nas suas últimas faturas.", es: "Un vistazo rápido a sus últimas facturas." },
+  "totalRevenue": { en: "+20.1% from last month", pt: "+20.1% do mês passado", es: "+20.1% desde el mes pasado" },
+  "pendingAmount": { en: "Across active invoices", pt: "Em faturas ativas", es: "En facturas activas" },
+  "overdueInvoices": { en: "Require immediate attention", pt: "Requerem atenção imediata", es: "Requieren atención inmediata" },
+};
+
 
 export default function DashboardPage() {
+  const { language } = useLanguage(); // Added
+
   const recentInvoices = placeholderInvoices.slice(0, 5);
   const totalRevenue = placeholderInvoices
     .filter(inv => inv.status === 'paid')
@@ -41,6 +61,9 @@ export default function DashboardPage() {
     .reduce((sum, inv) => sum + inv.totalAmount, 0);
   const overdueCount = placeholderInvoices.filter(inv => inv.status === 'overdue').length;
 
+  const getTranslatedCardTitle = (key: string) => cardTitleTranslations[key]?.[language] || key;
+  const getTranslatedCardDescription = (key: string) => cardDescriptionTranslations[key]?.[language] || key;
+
 
   return (
     <>
@@ -48,40 +71,40 @@ export default function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">{getTranslatedCardTitle("Total Revenue")}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <p className="text-xs text-muted-foreground">{getTranslatedCardDescription("totalRevenue")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Amount</CardTitle>
+            <CardTitle className="text-sm font-medium">{getTranslatedCardTitle("Pending Amount")}</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(pendingAmount)}</div>
-            <p className="text-xs text-muted-foreground">Across active invoices</p>
+            <p className="text-xs text-muted-foreground">{getTranslatedCardDescription("pendingAmount")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue Invoices</CardTitle>
+            <CardTitle className="text-sm font-medium">{getTranslatedCardTitle("Overdue Invoices")}</CardTitle>
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{overdueCount}</div>
-            <p className="text-xs text-muted-foreground">Require immediate attention</p>
+            <p className="text-xs text-muted-foreground">{getTranslatedCardDescription("overdueInvoices")}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Invoices</CardTitle>
-          <CardDescription>A quick look at your latest invoices.</CardDescription>
+          <CardTitle>{getTranslatedCardTitle("Recent Invoices")}</CardTitle>
+          <CardDescription>{getTranslatedCardDescription("recentInvoices")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>

@@ -18,8 +18,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Palette, Languages } from 'lucide-react'; // Added Palette and Languages icons
+import { Palette, Languages } from 'lucide-react'; 
 import type { Dispatch, SetStateAction } from 'react';
+import { useLanguage, type SupportedLanguage } from '@/contexts/language-context'; // Added
 
 interface AppHeaderProps {
   className?: string;
@@ -35,13 +36,14 @@ const backgroundOptions = [
   { value: 'bg-emerald-50', label: 'Light Emerald' },
 ];
 
-const handleLanguageChange = (language: string) => {
-  // In a real app, you would set the language preference using an i18n library
-  console.log(`Language selected: ${language}`);
-  // For example, you might use: router.push(pathname, { locale: language });
-};
-
 export function AppHeader({ className, currentBgClass, onBgChange }: AppHeaderProps) {
+  const { setLanguage } = useLanguage(); // Added
+
+  const handleLanguageChange = (language: SupportedLanguage) => { // Updated
+    setLanguage(language);
+    console.log(`Language selected: ${language}`);
+  };
+
   return (
     <header
       className={cn(
@@ -66,8 +68,7 @@ export function AppHeader({ className, currentBgClass, onBgChange }: AppHeaderPr
             <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleLanguageChange('es')}>Español</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleLanguageChange('pt')}>Português</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>Français</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleLanguageChange('de')}>Deutsch</DropdownMenuItem>
+            {/* Add more languages as needed */}
           </DropdownMenuContent>
         </DropdownMenu>
 
