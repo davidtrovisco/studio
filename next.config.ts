@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'export', // 🔹 fundamental para gerar site estático
+  output: 'export', // permite gerar versão estática
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    unoptimized: true, // 🔹 importante para export funcionar
+    unoptimized: true, // necessário para next export
     remotePatterns: [
       {
         protocol: 'https',
@@ -19,8 +19,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // 🔹 se o repositório não for do tipo teunome.github.io, ativa o basePath:
- // <--- só se o repo não for teunome.github.io
+  // Se o repositório for algo como github.com/davide/meu-site:
+  // basePath: '/meu-site'
+  // Se o repositório for davide.github.io, NÃO usa basePath
 };
 
 export default nextConfig;
